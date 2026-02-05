@@ -1,195 +1,657 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Enterprise Portal 2026</title>
-<style>
-  /* Role-Based Color Schemes */
-  :root { --primary: #6366f1; --secondary: #4338ca; }
-  body.admin { --primary: #991b1b; --secondary: #450a0a; }
-  body.consumer { --primary: #15803d; --secondary: #14532d; }
-  body.user { --primary: #6366f1; --secondary: #4338ca; }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EventMate - AI Event Planner (auth & join-only for users)</title>
+  <style>
+    :root { --primary: #6366f1; --secondary: #4338ca; }
+    body.admin { --primary: #991b1b; --secondary: #450a0a; }
+    body.consumer { --primary: #15803d; --secondary: #14532d; }
+    body.user { --primary: #6366f1; --secondary: #4338ca; }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex; flex-direction: column; transition: all 0.4s ease;
+      overflow-x: hidden; padding-bottom: 40px;
+    }
 
-  body {
-    height: 100vh;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    display: flex; flex-direction: column; transition: all 0.5s ease;
-    overflow-x: hidden;
-  }
+    nav {
+      padding: 12px 28px; background: rgba(0,0,0,0.18);
+      backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo-svg { height: 40px; width: 40px; fill: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); cursor: pointer; }
+    .nav-actions { color: white; font-weight: 700; display:flex; gap:12px; align-items:center; }
 
-  nav {
-    padding: 15px 40px; background: rgba(0,0,0,0.25);
-    backdrop-filter: blur(10px); display: flex; align-items: center;
-  }
-  .logo-svg { height: 40px; width: 40px; fill: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); cursor: pointer; }
+    .container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; }
 
-  .container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; }
+    .card {
+      background: white; border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.45);
+      width: 100%; max-width: 920px; display: none; overflow: hidden;
+      animation: slideUp 0.4s ease-out;
+    }
+    .active-card { display: block; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-  .card {
-    background: white; border-radius: 24px;
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-    width: 100%; max-width: 420px; display: none; overflow: hidden;
-    animation: slideUp 0.4s ease-out;
-    border-top: 10px solid var(--primary);
-  }
-  .active-card { display: block; }
+    .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: 420px; }
+    .left, .right { padding: 28px; }
+    .banner-img { width: 100%; height: 160px; object-fit: cover; border-bottom: 4px solid var(--primary); }
+    .card-body { padding: 30px; text-align: center; }
 
-  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .project-title { color: var(--primary); font-size: 28px; font-weight: 800; margin-bottom: 2px; letter-spacing: -1px; }
+    .project-sub { color: #4b5563; font-size: 13px; font-weight: 600; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
 
-  .card-body { padding: 40px 30px; text-align: center; }
+    h2 { margin-bottom: 10px; color: #111827; font-size: 20px; }
+    p.sub { font-size: 13px; color: #6b7280; margin-bottom: 20px; }
 
-  h2 { margin-bottom: 10px; color: #111827; font-size: 24px; }
-  p.sub { font-size: 13px; color: #6b7280; margin-bottom: 20px; }
+    .input-group { text-align: left; margin-bottom: 12px; }
+    label { font-size: 11px; font-weight: 700; color: #374151; display: block; margin-bottom: 6px; text-transform: uppercase; }
+    input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; transition: 0.15s; }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12); }
 
-  .input-group { text-align: left; margin-bottom: 15px; }
-  label { font-size: 11px; font-weight: 800; color: #374151; display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-  input, select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 15px; outline: none; transition: 0.2s; background: #f9fafb; }
-  input:focus, select:focus { border-color: var(--primary); background: white; }
+    .btn-main { width: 100%; padding: 12px; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+    .btn-main:hover { filter: brightness(1.06); transform: translateY(-1px); }
+    .small { font-size: 13px; color: #374151; }
 
-  .btn-main {
-    width: 100%; padding: 14px; border: none; border-radius: 10px;
-    background: var(--primary); color: white; font-weight: bold;
-    font-size: 16px; cursor: pointer; margin-top: 10px; transition: 0.3s;
-  }
-  .btn-main:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .social-area { margin-top: 18px; padding-top: 18px; border-top: 1px solid #f3f4f6; }
+    .social-icons { display: flex; justify-content: center; gap: 12px; margin-top: 8px; }
+    .s-btn { width: 40px; height: 40px; border-radius: 999px; display: flex; justify-content: center; align-items: center; border: 1px solid #e5e7eb; background: white; cursor: pointer; transition: 0.18s; }
+    .s-btn:hover { background: #f9fafb; transform: scale(1.06); }
 
-  .panel { display: none; background: white; padding: 40px; border-radius: 24px; width: 95%; max-width: 850px; margin: auto; text-align: center;}
-  .active-panel { display: block; }
-</style>
+    .toolbar { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; }
+    .card-inner { padding: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top:8px; font-size:14px; }
+    th, td { padding: 10px 8px; border-bottom: 1px solid #eef2ff; text-align: left; }
+    th { background: rgba(99,102,241,0.06); color: var(--primary); font-weight:700; }
+    .muted { color:#6b7280; font-size:13px; }
+    .pill { display:inline-block; padding:6px 10px; border-radius:999px; background:#f3f4ff; color:var(--primary); font-weight:700; font-size:12px; }
+
+    .actions { display:flex; gap:8px; }
+    .btn-ghost { background: transparent; border: 1px solid #e5e7eb; padding:8px 10px; border-radius:8px; cursor:pointer; }
+    .danger { background: #fee2e2; color:#991b1b; border: none; padding:8px 10px; border-radius:8px; cursor:pointer; }
+
+    @media (max-width: 820px) { .two-column { grid-template-columns: 1fr; } .container { padding: 12px; } .card { max-width: 520px; } }
+  </style>
 </head>
 <body class="user" id="mainBody">
 
-<nav>
-  <svg class="logo-svg" viewBox="0 0 24 24" onclick="location.reload()">
-    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-  </svg>
-</nav>
+  <nav>
+    <svg class="logo-svg" viewBox="0 0 24 24" onclick="location.reload()" title="Reload">
+      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+    </svg>
 
-<div class="container">
-
-  <!-- LOGIN CARD -->
-  <div id="loginCard" class="card active-card">
-    <div class="card-body">
-      <h2>Account Login</h2>
-      <p class="sub">Select your role and sign in</p>
-
-      <div class="input-group">
-        <label>Account Type</label>
-        <select id="loginRole">
-          <option value="user">User</option>
-          <option value="consumer">Consumer</option>
-          <option value="admin">Admin</option>
-        </select>
-      </div>
-
-      <div class="input-group">
-        <label>Username</label>
-        <input type="text" id="loginUser" placeholder="Username" />
-      </div>
-      <div class="input-group">
-        <label>Password</label>
-        <input type="password" id="loginPass" placeholder="••••••••" />
-      </div>
-
-      <button class="btn-main" onclick="performLogin()">Sign In</button>
-      <p style="margin-top:15px; font-size:13px;">No account? <span style="color:var(--primary); cursor:pointer; font-weight:700;" onclick="showCard('regCard')">Register Now</span></p>
+    <div class="nav-actions" id="navActions">
+      <span id="welcomeTxt" style="display:none"></span>
+      <button id="navLogout" class="btn-ghost" style="display:none" onclick="logout()">Logout</button>
     </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- AUTH CARD -->
+    <div id="authCard" class="card active-card">
+      <div class="two-column">
+        <div class="left">
+          <img src="https://images.unsplash.com/photo-1508873699372-7ae5a3f2d1f9?q=80&w=1400&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" class="banner-img" alt="banner">
+          <div class="card-inner">
+            <h1 class="project-title">EventMate</h1>
+            <p class="project-sub">AI Based Event Planner and Scheduler</p>
+            <p class="small">Admins and Consumers can create events. Standard users can view and join events only.</p>
+          </div>
+        </div>
+
+        <div class="right">
+          <!-- LOGIN VIEW -->
+          <div id="loginView" class="card-body">
+            <h2>Account Login</h2>
+            <p class="sub">Enter your credentials to access the portal</p>
+
+            <div class="input-group">
+              <label>Username</label>
+              <input type="text" id="loginUser" placeholder="Username" />
+            </div>
+            <div class="input-group">
+              <label>Password</label>
+              <input type="password" id="loginPass" placeholder="••••••••" />
+            </div>
+            <div class="input-group">
+              <label>Role (theme only)</label>
+              <select id="loginRole" onchange="changeTheme(this.value)">
+                <option value="user">Standard User</option>
+                <option value="consumer">Consumer</option>
+                <option value="admin">Administrator</option>
+              </select>
+            </div>
+
+            <button class="btn-main" onclick="performLogin()">Sign In</button>
+            <p style="margin-top:12px; font-size:13px;">No account? <span style="color:var(--primary); cursor:pointer; font-weight:700;" onclick="showCard('registerView')">Register Now</span></p>
+
+            <div class="social-area">
+              <div class="social-icons">
+                <button class="s-btn" onclick="window.open('https://google.com')">G</button>
+                <button class="s-btn" onclick="window.open('https://github.com')">GH</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- REGISTER VIEW -->
+          <div id="registerView" class="card-body" style="display:none">
+            <h2>Join Us</h2>
+            <p class="sub">Create your account to start joining events</p>
+
+            <div class="input-group">
+              <label>Full Name</label>
+              <input type="text" id="regName" placeholder="John Doe" />
+            </div>
+            <div class="input-group">
+              <label>Username</label>
+              <input type="text" id="regUser" placeholder="Create username" />
+            </div>
+            <div class="input-group">
+              <label>Password</label>
+              <input type="password" id="regPass" placeholder="••••••••" />
+            </div>
+            <div class="input-group">
+              <label>Confirm Password</label>
+              <input type="password" id="regPass2" placeholder="••••••••" />
+            </div>
+            <div class="input-group">
+              <label>Role</label>
+              <select id="regRole">
+                <option value="user">Standard User</option>
+                <option value="consumer">Consumer</option>
+                <option value="admin">Administrator</option>
+              </select>
+            </div>
+
+            <button class="btn-main" onclick="registerUser()">Sign Up</button>
+            <p style="margin-top:12px; font-size:13px;">Already have an account? <span style="color:var(--primary); cursor:pointer; font-weight:700;" onclick="showCard('loginView')">Login</span></p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD CARD -->
+    <div id="dashboardCard" class="card">
+      <div class="card-inner">
+        <div class="toolbar">
+          <div>
+            <h2 id="dashTitle">Dashboard</h2>
+            <div class="muted" id="dashSub">Events and actions</div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div id="userRolePill" class="pill"></div>
+            <button class="btn-main" id="openEventForm" onclick="toggleEventForm(true)" style="display:none">Create Event</button>
+            <button class="btn-ghost" id="adminRefresh" onclick="renderAdminPanel()" style="display:none">Refresh</button>
+            <button class="btn-ghost" id="btnLogoutTop" onclick="logout()">Logout</button>
+          </div>
+        </div>
+
+        <!-- Event form (admin & consumer only) -->
+        <div id="eventForm" style="display:none; margin-bottom:16px; border:1px solid #eef2ff; padding:12px; border-radius:10px;">
+          <h3 style="margin-bottom:10px">Create Event</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div><div class="input-group"><label>Event Title</label><input id="evtTitle" type="text" placeholder="Birthday / Meetup / Wedding"></div></div>
+            <div><div class="input-group"><label>Date</label><input id="evtDate" type="date"></div></div>
+            <div><div class="input-group"><label>Place / City</label><input id="evtPlace" type="text" placeholder="Eg: Chennai"></div></div>
+            <div><div class="input-group"><label>Venue</label><input id="evtVenue" type="text" placeholder="Eg: Grand Hall"></div></div>
+          </div>
+          <div style="margin-top:10px; display:flex; gap:8px;">
+            <button class="btn-main" onclick="saveEvent()">Save Event</button>
+            <button class="btn-ghost" onclick="toggleEventForm(false)">Cancel</button>
+          </div>
+        </div>
+
+        <!-- For standard users: Available events (join) and Joined events -->
+        <div id="availableEventsPanel" style="display:none">
+          <h3>Available Events</h3>
+          <div id="availableEventsList" style="margin-top:10px"></div>
+        </div>
+
+        <div id="joinedEventsPanel" style="display:none; margin-top:12px;">
+          <h3>Your Joined Events</h3>
+          <div id="joinedEventsList" style="margin-top:10px"></div>
+        </div>
+
+        <!-- For creators (consumer/admin): their created events -->
+        <div id="creatorEventsPanel" style="display:none">
+          <h3>Your Created Events</h3>
+          <div id="creatorEventsList" style="margin-top:10px"></div>
+        </div>
+
+        <!-- Admin management panel -->
+        <div id="adminPanel" style="display:none; margin-top:12px;">
+          <h3>All Users</h3>
+          <div id="adminUsers" style="margin-top:10px"></div>
+
+          <h3 style="margin-top:18px">All Events</h3>
+          <div id="adminEvents" style="margin-top:10px"></div>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 
-  <!-- REGISTER CARD -->
-  <div id="regCard" class="card">
-    <div class="card-body">
-      <h2>Join Us</h2>
-      <p class="sub">Create your specialized account</p>
+  <script>
+    // Keys:
+    // em_users => [{username, password, name, role, createdAt}]
+    // em_events => [{id, title, date, place, venue, username (creator), attendees: [usernames], createdAt}]
+    // em_current => username
 
-      <div class="input-group">
-        <label>Register As</label>
-        <select id="regRole">
-          <option value="user">User</option>
-          <option value="consumer">Consumer</option>
-          <option value="admin">Admin</option>
-        </select>
-      </div>
+    function genId() { return 'evt_' + Math.random().toString(36).slice(2,9); }
 
-      <div class="input-group"><label>Full Name</label><input type="text" id="regName" placeholder="John Doe" /></div>
-      <div class="input-group"><label>Username</label><input type="text" id="regUser" placeholder="Create username" /></div>
-      <div class="input-group"><label>Password</label><input type="password" id="regPass" placeholder="••••••••" /></div>
-
-      <button class="btn-main" onclick="handleReg()">Create Account</button>
-      <p style="margin-top:15px; font-size:13px;">Already registered? <span style="color:var(--primary); cursor:pointer; font-weight:700;" onclick="showCard('loginCard')">Sign In</span></p>
-    </div>
-  </div>
-
-  <!-- USER PANEL -->
-  <div id="userPanel" class="panel">
-    <h2 style="color:var(--primary)">Welcome, <span id="userGreet"></span>!</h2>
-    <p style="margin-top: 10px; color: #6b7280;">Role: <strong id="roleDisplay" style="text-transform: uppercase;"></strong></p>
-    <div style="margin-top: 30px;">
-        <button class="btn-main" style="max-width: 200px;" onclick="location.reload()">Logout</button>
-    </div>
-  </div>
-
-</div>
-
-<script>
-  function showCard(id) {
-    document.querySelectorAll('.card, .panel').forEach(el => {
-      el.classList.remove('active-card', 'active-panel');
-      el.style.display = 'none';
-    });
-    const target = document.getElementById(id);
-    target.style.display = 'block';
-    if(id.includes('Card')) target.classList.add('active-card');
-  }
-
-  function handleReg() {
-    const role = document.getElementById('regRole').value;
-    const name = document.getElementById('regName').value;
-    const user = document.getElementById('regUser').value;
-    const pass = document.getElementById('regPass').value;
-
-    if (!user || !pass || !name) return alert("Please fill in all fields!");
-
-    // Store user data including their specific role
-    const userData = { name, pass, role };
-    localStorage.setItem(user, JSON.stringify(userData));
-
-    alert(`Registration successful as ${role.toUpperCase()}!`);
-    showCard('loginCard');
-  }
-
-  function performLogin() {
-    const roleInput = document.getElementById('loginRole').value;
-    const userInput = document.getElementById('loginUser').value;
-    const passInput = document.getElementById('loginPass').value;
-
-    const savedData = localStorage.getItem(userInput);
-    
-    if (savedData) {
-      const user = JSON.parse(savedData);
-      
-      // Check password AND role match
-      if (user.pass === passInput && user.role === roleInput) {
-        // Change UI Theme based on the logged-in role
-        document.body.className = user.role;
-        
-        document.getElementById('userGreet').innerText = user.name;
-        document.getElementById('roleDisplay').innerText = user.role;
-        showCard('userPanel');
-        document.getElementById('userPanel').classList.add('active-panel');
-      } else if (user.role !== roleInput) {
-        alert(`Account found, but it is registered as a ${user.role.toUpperCase()}. Please select the correct role.`);
-      } else {
-        alert("Wrong password!");
-      }
-    } else {
-      alert("User not found. Please register first.");
+    function getUsers() { return JSON.parse(localStorage.getItem('em_users') || '[]'); }
+    function setUsers(u) { localStorage.setItem('em_users', JSON.stringify(u)); }
+    function getEvents() { 
+      const raw = JSON.parse(localStorage.getItem('em_events') || '[]');
+      return raw.map(e => Object.assign({ attendees: [] }, e));
     }
-  }
-</script>
+    function setEvents(e) { localStorage.setItem('em_events', JSON.stringify(e)); }
 
+    function initData() {
+      if (!localStorage.getItem('em_users')) {
+        const defaultUsers = [
+          { username: 'admin', password: 'admin123', name: 'Administrator', role: 'admin', createdAt: new Date().toISOString() },
+          { username: 'alice', password: 'alice123', name: 'Alice', role: 'user', createdAt: new Date().toISOString() },
+          { username: 'bob', password: 'bob123', name: 'Bob', role: 'consumer', createdAt: new Date().toISOString() }
+        ];
+        localStorage.setItem('em_users', JSON.stringify(defaultUsers));
+      }
+      if (!localStorage.getItem('em_events')) {
+        const defaultEvents = [
+          { id: genId(), title: 'Alice Birthday', date: '2026-03-12', place: 'Chennai', venue: 'Sunshine Hall', username: 'alice', attendees: [], createdAt: new Date().toISOString() }
+        ];
+        localStorage.setItem('em_events', JSON.stringify(defaultEvents));
+      } else {
+        const evts = getEvents();
+        setEvents(evts);
+      }
+      renderNav();
+    }
+
+    // UI helpers
+    function showCard(view) {
+      document.getElementById('loginView').style.display = (view === 'loginView') ? 'block' : 'none';
+      document.getElementById('registerView').style.display = (view === 'registerView') ? 'block' : 'none';
+      document.getElementById('authCard').classList.add('active-card');
+      document.getElementById('dashboardCard').classList.remove('active-card');
+    }
+
+    function changeTheme(role) { document.getElementById('mainBody').className = role; }
+
+    function renderNav() {
+      const current = localStorage.getItem('em_current');
+      const welcome = document.getElementById('welcomeTxt');
+      const logoutBtn = document.getElementById('navLogout');
+      if (current) {
+        const u = getUsers().find(x => x.username === current);
+        welcome.style.display = 'inline';
+        logoutBtn.style.display = 'inline-block';
+        welcome.textContent = 'Hello, ' + (u ? u.name || u.username : current);
+      } else {
+        welcome.style.display = 'none';
+        logoutBtn.style.display = 'none';
+      }
+    }
+
+    // Registration
+    function registerUser() {
+      const name = document.getElementById('regName').value.trim();
+      const username = document.getElementById('regUser').value.trim();
+      const pass = document.getElementById('regPass').value;
+      const pass2 = document.getElementById('regPass2').value;
+      const role = document.getElementById('regRole').value || 'user';
+
+      if (!name || !username || !pass) { alert('Please fill all required fields'); return; }
+      if (pass !== pass2) { alert('Passwords do not match'); return; }
+
+      const users = getUsers();
+      if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) { alert('Username already exists'); return; }
+
+      users.push({ username, password: pass, name, role, createdAt: new Date().toISOString() });
+      setUsers(users);
+      alert('Registration successful! You can now login.');
+      document.getElementById('loginUser').value = username;
+      document.getElementById('loginPass').value = '';
+      showCard('loginView');
+    }
+
+    // Login
+    function performLogin() {
+      const username = document.getElementById('loginUser').value.trim();
+      const password = document.getElementById('loginPass').value;
+
+      if (!username || !password) { alert('Please enter username and password'); return; }
+      const user = getUsers().find(u => u.username === username && u.password === password);
+      if (!user) { alert('Invalid credentials'); return; }
+
+      localStorage.setItem('em_current', user.username);
+      changeTheme(user.role);
+      renderNav();
+      showDashboardFor(user.role);
+    }
+
+    function showDashboardFor(role) {
+      document.getElementById('authCard').classList.remove('active-card');
+      document.getElementById('dashboardCard').classList.add('active-card');
+
+      const cur = localStorage.getItem('em_current');
+      const u = getUsers().find(x => x.username === cur);
+      document.getElementById('dashTitle').textContent = u ? ('Welcome, ' + (u.name || u.username)) : 'Dashboard';
+      document.getElementById('dashSub').textContent = 'Role: ' + (u ? u.role : role);
+      document.getElementById('userRolePill').textContent = (u ? u.role.toUpperCase() : role).slice(0,10);
+
+      // hide all panels, then enable relevant ones
+      document.getElementById('eventForm').style.display = 'none';
+      document.getElementById('availableEventsPanel').style.display = 'none';
+      document.getElementById('joinedEventsPanel').style.display = 'none';
+      document.getElementById('creatorEventsPanel').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('openEventForm').style.display = 'none';
+      document.getElementById('adminRefresh').style.display = 'none';
+
+      if (u && u.role === 'admin') {
+        // admin: manage users & events; also can create events
+        document.getElementById('adminPanel').style.display = 'block';
+        document.getElementById('openEventForm').style.display = 'inline-block';
+        document.getElementById('adminRefresh').style.display = 'inline-block';
+        renderAdminPanel();
+        renderCreatorEvents();
+      } else if (u && u.role === 'consumer') {
+        // consumer: can create events; see their created events
+        document.getElementById('openEventForm').style.display = 'inline-block';
+        document.getElementById('eventForm').style.display = 'none';
+        document.getElementById('creatorEventsPanel').style.display = 'block';
+        renderCreatorEvents();
+      } else {
+        // standard user: only join events
+        document.getElementById('availableEventsPanel').style.display = 'block';
+        document.getElementById('joinedEventsPanel').style.display = 'block';
+        renderAvailableEventsForUser();
+        renderJoinedEventsForUser();
+      }
+    }
+
+    function toggleEventForm(show) {
+      // Only allow show if current role is admin or consumer
+      const cur = localStorage.getItem('em_current');
+      const u = getUsers().find(x => x.username === cur);
+      if (!u || (u.role !== 'admin' && u.role !== 'consumer')) {
+        alert('Only Admins and Consumers can create events.');
+        return;
+      }
+      document.getElementById('eventForm').style.display = show ? 'block' : 'none';
+    }
+
+    function saveEvent() {
+      const title = document.getElementById('evtTitle').value.trim();
+      const date = document.getElementById('evtDate').value;
+      const place = document.getElementById('evtPlace').value.trim();
+      const venue = document.getElementById('evtVenue').value.trim();
+
+      if (!title || !date || !place || !venue) { alert('Please fill all event fields'); return; }
+      const current = localStorage.getItem('em_current');
+      if (!current) { alert('Not logged in'); return; }
+      const u = getUsers().find(x => x.username === current);
+      if (!u || (u.role !== 'admin' && u.role !== 'consumer')) {
+        alert('Only Admins and Consumers can create events.');
+        return;
+      }
+
+      const evts = getEvents();
+      const newEvt = { id: genId(), title, date, place, venue, username: current, attendees: [], createdAt: new Date().toISOString() };
+      evts.push(newEvt);
+      setEvents(evts);
+
+      document.getElementById('evtTitle').value = '';
+      document.getElementById('evtDate').value = '';
+      document.getElementById('evtPlace').value = '';
+      document.getElementById('evtVenue').value = '';
+      toggleEventForm(false);
+
+      if (u.role === 'admin') { renderAdminPanel(); renderCreatorEvents(); }
+      if (u.role === 'consumer') { renderCreatorEvents(); }
+
+      alert('Event saved');
+    }
+
+    // JOIN / LEAVE logic for standard users
+    function renderAvailableEventsForUser() {
+      const container = document.getElementById('availableEventsList');
+      const current = localStorage.getItem('em_current');
+      const evts = getEvents().slice().sort((a,b)=> new Date(a.date) - new Date(b.date));
+      if (!evts.length) { container.innerHTML = '<div class="muted">No events available.</div>'; return; }
+
+      let html = '<table><thead><tr><th>Title</th><th>Date</th><th>Place</th><th>Venue</th><th>Host</th><th></th></tr></thead><tbody>';
+      for (const e of evts) {
+        const joined = e.attendees && e.attendees.includes(current);
+        html += `<tr>
+          <td>${escapeHtml(e.title)}</td>
+          <td>${escapeHtml(e.date)}</td>
+          <td>${escapeHtml(e.place)}</td>
+          <td>${escapeHtml(e.venue)}</td>
+          <td>${escapeHtml(e.username)}</td>
+          <td class="actions">` +
+            (joined
+              ? `<button class="btn-ghost" onclick="leaveEvent('${e.id}')">Leave</button>`
+              : `<button class="btn-main" onclick="joinEvent('${e.id}')">Join</button>`) +
+          `</td></tr>`;
+      }
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    function renderJoinedEventsForUser() {
+      const container = document.getElementById('joinedEventsList');
+      const current = localStorage.getItem('em_current');
+      const evts = getEvents().filter(e => e.attendees && e.attendees.includes(current)).sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt));
+      if (!evts.length) { container.innerHTML = '<div class="muted">You have not joined any events yet.</div>'; return; }
+
+      let html = '<table><thead><tr><th>Title</th><th>Date</th><th>Place</th><th>Venue</th><th>Host</th><th></th></tr></thead><tbody>';
+      for (const e of evts) {
+        html += `<tr>
+          <td>${escapeHtml(e.title)}</td>
+          <td>${escapeHtml(e.date)}</td>
+          <td>${escapeHtml(e.place)}</td>
+          <td>${escapeHtml(e.venue)}</td>
+          <td>${escapeHtml(e.username)}</td>
+          <td class="actions"><button class="btn-ghost" onclick="leaveEvent('${e.id}')">Leave</button></td>
+        </tr>`;
+      }
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    function joinEvent(id) {
+      const current = localStorage.getItem('em_current');
+      if (!current) { alert('Please login to join events'); return; }
+
+      const evts = getEvents();
+      const idx = evts.findIndex(e => e.id === id);
+      if (idx === -1) return;
+      evts[idx].attendees = evts[idx].attendees || [];
+      if (!evts[idx].attendees.includes(current)) evts[idx].attendees.push(current);
+      setEvents(evts);
+      renderAvailableEventsForUser();
+      renderJoinedEventsForUser();
+      alert('You have joined the event');
+    }
+
+    function leaveEvent(id) {
+      const current = localStorage.getItem('em_current');
+      if (!current) return;
+      let evts = getEvents();
+      const idx = evts.findIndex(e => e.id === id);
+      if (idx === -1) return;
+      evts[idx].attendees = (evts[idx].attendees || []).filter(u => u !== current);
+      setEvents(evts);
+      const curUser = getUsers().find(x => x.username === current);
+      if (curUser && curUser.role === 'user') { renderAvailableEventsForUser(); renderJoinedEventsForUser(); }
+      else { renderCreatorEvents(); renderAdminPanel(); }
+      alert('You have left the event');
+    }
+
+    // Creator events (creator = admin or consumer)
+    function renderCreatorEvents() {
+      const container = document.getElementById('creatorEventsList');
+      const current = localStorage.getItem('em_current');
+      const evts = getEvents().filter(e => e.username === current).sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt));
+      if (!evts.length) { container.innerHTML = '<div class="muted">You have not created any events yet.</div>'; return; }
+      let html = '<table><thead><tr><th>Title</th><th>Date</th><th>Place</th><th>Venue</th><th>Attendees</th><th></th></tr></thead><tbody>';
+      for (const e of evts) {
+        const attCount = (e.attendees || []).length;
+        html += `<tr>
+          <td>${escapeHtml(e.title)}</td>
+          <td>${escapeHtml(e.date)}</td>
+          <td>${escapeHtml(e.place)}</td>
+          <td>${escapeHtml(e.venue)}</td>
+          <td>${attCount}</td>
+          <td class="actions">
+            <button class="btn-ghost" onclick="downloadEvent('${e.id}')">Export</button>
+            <button class="danger" onclick="deleteEventAsCreator('${e.id}')">Delete</button>
+          </td>
+        </tr>`;
+      }
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    function deleteEventAsCreator(id) {
+      const current = localStorage.getItem('em_current');
+      let evts = getEvents();
+      const evt = evts.find(e => e.id === id);
+      if (!evt) return;
+      if (evt.username !== current && getUsers().find(u=>u.username===current).role !== 'admin') {
+        alert('You can only delete events you created');
+        return;
+      }
+      if (!confirm('Delete this event?')) return;
+      evts = evts.filter(e => e.id !== id);
+      setEvents(evts);
+      renderCreatorEvents();
+      renderAvailableEventsForUser();
+      renderAdminPanel();
+    }
+
+    // Admin panel
+    function renderAdminPanel() {
+      const users = getUsers().slice().sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt));
+      const events = getEvents().slice().sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt));
+
+      const uContainer = document.getElementById('adminUsers');
+      if (!users.length) uContainer.innerHTML = '<div class="muted">No registered users.</div>';
+      else {
+        let uHtml = '<table><thead><tr><th>Username</th><th>Name</th><th>Role</th><th>Created</th><th></th></tr></thead><tbody>';
+        for (const u of users) {
+          uHtml += `<tr>
+            <td>${escapeHtml(u.username)}</td>
+            <td>${escapeHtml(u.name||'')}</td>
+            <td>${escapeHtml(u.role)}</td>
+            <td>${new Date(u.createdAt).toLocaleString()}</td>
+            <td><button class="danger" onclick="adminDeleteUser('${u.username}')">Delete</button></td>
+          </tr>`;
+        }
+        uHtml += '</tbody></table>';
+        uContainer.innerHTML = uHtml;
+      }
+
+      const eContainer = document.getElementById('adminEvents');
+      if (!events.length) eContainer.innerHTML = '<div class="muted">No events created.</div>';
+      else {
+        let eHtml = '<table><thead><tr><th>Title</th><th>Date</th><th>Place</th><th>Venue</th><th>Host</th><th>Attendees</th><th></th></tr></thead><tbody>';
+        for (const e of events) {
+          const attendees = (e.attendees || []).join(', ');
+          eHtml += `<tr>
+            <td>${escapeHtml(e.title)}</td>
+            <td>${escapeHtml(e.date)}</td>
+            <td>${escapeHtml(e.place)}</td>
+            <td>${escapeHtml(e.venue)}</td>
+            <td>${escapeHtml(e.username)}</td>
+            <td>${escapeHtml(attendees || '-')}</td>
+            <td><button class="danger" onclick="adminDeleteEvent('${e.id}')">Delete</button></td>
+          </tr>`;
+        }
+        eHtml += '</tbody></table>';
+        eContainer.innerHTML = eHtml;
+      }
+    }
+
+    // Delete functions
+    function deleteEvent(id) {
+      deleteEventAsCreator(id);
+    }
+
+    function adminDeleteEvent(id) {
+      if (!confirm('Admin: Delete event permanently?')) return;
+      let evts = getEvents().filter(e => e.id !== id);
+      setEvents(evts);
+      renderAdminPanel();
+    }
+
+    function adminDeleteUser(username) {
+      if (!confirm('Admin: Delete user and their events?')) return;
+      let users = getUsers().filter(u => u.username !== username);
+      setUsers(users);
+      const remaining = getEvents().filter(e => e.username !== username);
+      setEvents(remaining);
+      const cur = localStorage.getItem('em_current');
+      if (cur === username) logout();
+      else renderAdminPanel();
+    }
+
+    function downloadEvent(id) {
+      const evts = getEvents();
+      const e = evts.find(x => x.id === id);
+      if (!e) return;
+      const data = `Event: ${e.title}\nDate: ${e.date}\nPlace: ${e.place}\nVenue: ${e.venue}\nHost: ${e.username}\nAttendees: ${(e.attendees||[]).join(', ')}\nCreated: ${e.createdAt}`;
+      const blob = new Blob([data], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${e.title.replace(/\s+/g,'_')}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Logout
+    function logout() {
+      localStorage.removeItem('em_current');
+      document.getElementById('dashboardCard').classList.remove('active-card');
+      document.getElementById('authCard').classList.add('active-card');
+      changeTheme('user');
+      renderNav();
+    }
+
+    function escapeHtml(str) {
+      if (!str && str !== 0) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    // Init and auto-login
+    initData();
+    showCard('loginView');
+
+    (function tryAutoLogin() {
+      const cur = localStorage.getItem('em_current');
+      if (cur) {
+        const u = getUsers().find(x => x.username === cur);
+        if (u) {
+          changeTheme(u.role || 'user');
+          showDashboardFor(u.role);
+        } else localStorage.removeItem('em_current');
+      }
+    })();
+
+  </script>
 </body>
 </html>
