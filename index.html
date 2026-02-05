@@ -8,6 +8,7 @@
   /* Role-Based Color Schemes */
   :root { --primary: #6366f1; --secondary: #4338ca; }
   body.admin { --primary: #991b1b; --secondary: #450a0a; }
+  body.consumer { --primary: #15803d; --secondary: #14532d; }
   body.user { --primary: #6366f1; --secondary: #4338ca; }
 
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
@@ -27,7 +28,6 @@
 
   .container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; }
 
-  /* Card Visuals with Primary Top Border */
   .card {
     background: white; border-radius: 24px;
     box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
@@ -45,9 +45,9 @@
   p.sub { font-size: 13px; color: #6b7280; margin-bottom: 20px; }
 
   .input-group { text-align: left; margin-bottom: 15px; }
-  label { font-size: 12px; font-weight: 700; color: #374151; display: block; margin-bottom: 5px; text-transform: uppercase; }
-  input, select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 15px; outline: none; transition: 0.2s; }
-  input:focus { border-color: var(--primary); ring: 2px var(--primary); }
+  label { font-size: 11px; font-weight: 800; color: #374151; display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+  input, select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 15px; outline: none; transition: 0.2s; background: #f9fafb; }
+  input:focus, select:focus { border-color: var(--primary); background: white; }
 
   .btn-main {
     width: 100%; padding: 14px; border: none; border-radius: 10px;
@@ -56,7 +56,7 @@
   }
   .btn-main:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-  .panel { display: none; background: white; padding: 40px; border-radius: 24px; width: 95%; max-width: 850px; margin: auto; }
+  .panel { display: none; background: white; padding: 40px; border-radius: 24px; width: 95%; max-width: 850px; margin: auto; text-align: center;}
   .active-panel { display: block; }
 </style>
 </head>
@@ -74,7 +74,16 @@
   <div id="loginCard" class="card active-card">
     <div class="card-body">
       <h2>Account Login</h2>
-      <p class="sub">Sign in with your registered details</p>
+      <p class="sub">Select your role and sign in</p>
+
+      <div class="input-group">
+        <label>Account Type</label>
+        <select id="loginRole">
+          <option value="user">User</option>
+          <option value="consumer">Consumer</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
 
       <div class="input-group">
         <label>Username</label>
@@ -94,7 +103,16 @@
   <div id="regCard" class="card">
     <div class="card-body">
       <h2>Join Us</h2>
-      <p class="sub">Create an account to access the portal</p>
+      <p class="sub">Create your specialized account</p>
+
+      <div class="input-group">
+        <label>Register As</label>
+        <select id="regRole">
+          <option value="user">User</option>
+          <option value="consumer">Consumer</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
 
       <div class="input-group"><label>Full Name</label><input type="text" id="regName" placeholder="John Doe" /></div>
       <div class="input-group"><label>Username</label><input type="text" id="regUser" placeholder="Create username" /></div>
@@ -107,15 +125,16 @@
 
   <!-- USER PANEL -->
   <div id="userPanel" class="panel">
-    <h2 style="color:var(--primary)">Hello, <span id="userGreet"></span>!</h2>
-    <p style="margin-bottom: 25px;">You have successfully logged in.</p>
-    <button class="btn-main" style="max-width: 200px;" onclick="location.reload()">Logout</button>
+    <h2 style="color:var(--primary)">Welcome, <span id="userGreet"></span>!</h2>
+    <p style="margin-top: 10px; color: #6b7280;">Role: <strong id="roleDisplay" style="text-transform: uppercase;"></strong></p>
+    <div style="margin-top: 30px;">
+        <button class="btn-main" style="max-width: 200px;" onclick="location.reload()">Logout</button>
+    </div>
   </div>
 
 </div>
 
 <script>
-  // Show/Hide Cards
   function showCard(id) {
     document.querySelectorAll('.card, .panel').forEach(el => {
       el.classList.remove('active-card', 'active-panel');
@@ -126,24 +145,24 @@
     if(id.includes('Card')) target.classList.add('active-card');
   }
 
-  // Registration Logic: Save user object to LocalStorage
   function handleReg() {
+    const role = document.getElementById('regRole').value;
     const name = document.getElementById('regName').value;
     const user = document.getElementById('regUser').value;
     const pass = document.getElementById('regPass').value;
 
-    if (!user || !pass) return alert("Please fill in all fields!");
+    if (!user || !pass || !name) return alert("Please fill in all fields!");
 
-    // Store user as JSON string
-    const userData = { name, pass };
+    // Store user data including their specific role
+    const userData = { name, pass, role };
     localStorage.setItem(user, JSON.stringify(userData));
 
-    alert("Registration successful! Please login.");
+    alert(`Registration successful as ${role.toUpperCase()}!`);
     showCard('loginCard');
   }
 
-  // Login Logic: Verify credentials from LocalStorage
   function performLogin() {
+    const roleInput = document.getElementById('loginRole').value;
     const userInput = document.getElementById('loginUser').value;
     const passInput = document.getElementById('loginPass').value;
 
@@ -152,13 +171,17 @@
     if (savedData) {
       const user = JSON.parse(savedData);
       
-      if (user.pass === passInput) {
-        // Change UI Theme for Admin
-        document.body.className = (userInput.toLowerCase() === 'admin') ? 'admin' : 'user';
+      // Check password AND role match
+      if (user.pass === passInput && user.role === roleInput) {
+        // Change UI Theme based on the logged-in role
+        document.body.className = user.role;
         
-        document.getElementById('userGreet').innerText = user.name || userInput;
+        document.getElementById('userGreet').innerText = user.name;
+        document.getElementById('roleDisplay').innerText = user.role;
         showCard('userPanel');
         document.getElementById('userPanel').classList.add('active-panel');
+      } else if (user.role !== roleInput) {
+        alert(`Account found, but it is registered as a ${user.role.toUpperCase()}. Please select the correct role.`);
       } else {
         alert("Wrong password!");
       }
