@@ -1,162 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EventMate - AI Event Planner</title>
-    <style>
-        /* Role-Based Color Schemes */
-        :root { --primary: #6366f1; --secondary: #4338ca; }
-        body.admin { --primary: #991b1b; --secondary: #450a0a; }
-        body.consumer { --primary: #15803d; --secondary: #14532d; }
-        body.user { --primary: #6366f1; --secondary: #4338ca; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Enterprise Portal 2026</title>
+<style>
+  /* Role-Based Color Schemes */
+  :root { --primary: #6366f1; --secondary: #4338ca; }
+  body.admin { --primary: #991b1b; --secondary: #450a0a; }
+  body.consumer { --primary: #15803d; --secondary: #14532d; }
+  body.user { --primary: #6366f1; --secondary: #4338ca; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
 
-        body {
-            height: 100vh;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            display: flex; flex-direction: column; transition: all 0.5s ease;
-            overflow-x: hidden;
-        }
+  body {
+    height: 100vh;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex; flex-direction: column; transition: all 0.5s ease;
+    overflow-x: hidden;
+  }
 
-        nav {
-            padding: 15px 40px; background: rgba(0,0,0,0.25);
-            backdrop-filter: blur(10px); display: flex; align-items: center;
-        }
-        .logo-svg { height: 40px; width: 40px; fill: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); cursor: pointer; }
+  /* Nav Bar with SVG Logo */
+  nav {
+    padding: 15px 40px; background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(10px); display: flex; align-items: center;
+  }
+  .logo-svg { height: 40px; width: 40px; fill: white; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); cursor: pointer; }
 
-        .container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; }
+  .container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; }
 
-        .card {
-            background: white; border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            width: 100%; max-width: 420px; display: none; overflow: hidden;
-            animation: slideUp 0.4s ease-out;
-        }
-        .active-card { display: block; }
+  /* Card Visuals */
+  .card {
+    background: white; border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    width: 100%; max-width: 420px; display: none; overflow: hidden;
+    animation: slideUp 0.4s ease-out;
+  }
+  .active-card { display: block; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .banner-img { width: 100%; height: 120px; object-fit: cover; border-bottom: 4px solid var(--primary); }
-        .card-body { padding: 30px; text-align: center; }
+  .banner-img { width: 100%; height: 140px; object-fit: cover; border-bottom: 4px solid var(--primary); }
+  .card-body { padding: 30px; text-align: center; }
 
-        /* Project Title Styling */
-        .project-title { color: var(--primary); font-size: 28px; font-weight: 800; margin-bottom: 2px; letter-spacing: -1px; }
-        .project-sub { color: #4b5563; font-size: 13px; font-weight: 600; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+  h2 { margin-bottom: 10px; color: #111827; font-size: 24px; }
+  p.sub { font-size: 13px; color: #6b7280; margin-bottom: 20px; }
 
-        h2 { margin-bottom: 10px; color: #111827; font-size: 20px; }
-        p.sub { font-size: 13px; color: #6b7280; margin-bottom: 20px; }
+  .input-group { text-align: left; margin-bottom: 15px; }
+  label { font-size: 12px; font-weight: 700; color: #374151; display: block; margin-bottom: 5px; text-transform: uppercase; }
+  input, select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 15px; outline: none; transition: 0.2s; }
+  input:focus { border-color: var(--primary); ring: 2px var(--primary); }
 
-        .input-group { text-align: left; margin-bottom: 15px; }
-        label { font-size: 11px; font-weight: 700; color: #374151; display: block; margin-bottom: 5px; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 15px; outline: none; transition: 0.2s; }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
+  .btn-main {
+    width: 100%; padding: 14px; border: none; border-radius: 10px;
+    background: var(--primary); color: white; font-weight: bold;
+    font-size: 16px; cursor: pointer; margin-top: 10px; transition: 0.3s;
+  }
+  .btn-main:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-        .btn-main {
-            width: 100%; padding: 14px; border: none; border-radius: 10px;
-            background: var(--primary); color: white; font-weight: bold;
-            font-size: 16px; cursor: pointer; margin-top: 10px; transition: 0.3s;
-        }
-        .btn-main:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  /* Social Icons Section */
+  .social-area { margin-top: 20px; padding-top: 20px; border-top: 1px solid #f3f4f6; }
+  .social-icons { display: flex; justify-content: center; gap: 15px; margin-top: 10px; }
+  .s-btn {
+    width: 42px; height: 42px; border-radius: 50%; display: flex;
+    justify-content: center; align-items: center; border: 1px solid #e5e7eb;
+    background: white; cursor: pointer; transition: 0.2s;
+  }
+  .s-btn:hover { background: #f9fafb; transform: scale(1.1); }
+  .s-btn svg { width: 20px; height: 20px; }
 
-        .social-area { margin-top: 20px; padding-top: 20px; border-top: 1px solid #f3f4f6; }
-        .social-icons { display: flex; justify-content: center; gap: 15px; margin-top: 10px; }
-        .s-btn {
-            width: 42px; height: 42px; border-radius: 50%; display: flex;
-            justify-content: center; align-items: center; border: 1px solid #e5e7eb;
-            background: white; cursor: pointer; transition: 0.2s;
-        }
-        .s-btn:hover { background: #f9fafb; transform: scale(1.1); }
-        .s-btn svg { width: 20px; height: 20px; }
-    </style>
+  /* Panels */
+  .panel { display: none; background: white; padding: 40px; border-radius: 24px; width: 95%; max-width: 850px; margin: auto; }
+  .active-panel { display: block; }
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  th, td { padding: 12px; border-bottom: 1px solid #f3f4f6; text-align: left; font-size: 14px; }
+  th { color: #6b7280; font-weight: 600; text-transform: uppercase; font-size: 12px; }
+</style>
 </head>
 <body class="user" id="mainBody">
 
-    <nav>
-        <svg class="logo-svg" viewBox="0 0 24 24" onclick="location.reload()">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-        </svg>
-    </nav>
+<nav>
+  <!-- SVG LOGO IMAGE -->
+  <svg class="logo-svg" viewBox="0 0 24 24" onclick="location.reload()">
+    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+  </svg>
+</nav>
 
-    <div class="container">
+<div class="container">
 
-        <!-- LOGIN CARD -->
-        <div id="loginCard" class="card active-card">
-            <img src="https://images.unsplash.com" class="banner-img" alt="Login">
-            <div class="card-body">
-                <h1 class="project-title">EventMate</h1>
-                <p class="project-sub">AI Based Event Planner and Scheduler</p>
-                
-                <h2>Account Login</h2>
-                <p class="sub">Enter your credentials to access the portal</p>
+  <!-- LOGIN CARD -->
+  <div id="loginCard" class="card active-card">
+    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e" class="banner-img" alt="Login" />
+    <div class="card-body">
+      <h2>Account Login</h2>
+      <p class="sub">Enter your credentials to access the portal</p>
 
-                <div class="input-group">
-                    <label>Username</label>
-                    <input type="text" id="loginUser" placeholder="Username">
-                </div>
-                <div class="input-group">
-                    <label>Password</label>
-                    <input type="password" id="loginPass" placeholder="••••••••">
-                </div>
-                <div class="input-group">
-                    <label>Role</label>
-                    <select id="loginRole" onchange="changeTheme(this.value)">
-                        <option value="user">Standard User</option>
-                        <option value="consumer">Consumer</option>
-                        <option value="admin">Administrator</option>
-                    </select>
-                </div>
+      <div class="input-group">
+        <label>Username</label>
+        <input type="text" id="loginUser" placeholder="Username" />
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="••••••••" />
+      </div>
 
-                <button class="btn-main" onclick="performLogin()">Sign In</button>
-                <p style="margin-top:15px; font-size:13px;">No account? <span style="color:var(--primary); cursor:pointer; font-weight:700;" onclick="showCard('regCard')">Register Now</span></p>
+      <button class="btn-main" onclick="performLogin()">Sign In</button>
+      <p style="margin-top:15px; font-size:13px;">No account? <span style="color:var(--primary); cursor:pointer; font-weight:700;" onclick="showCard('regCard')">Register Now</span></p>
 
-                <div class="social-area">
-                    <div class="social-icons">
-                        <button class="s-btn" onclick="window.open('https://google.com')"><svg viewBox="0 0 24 24"><path fill="#EA4335" d="M12.48 10.92v3.28h7.84c-.24 1.84-1.92 5.44-7.84 5.44-5.12 0-9.28-4.24-9.28-9.44s4.16-9.44 9.28-9.44c2.92 0 4.88 1.2 6 2.28l2.6-2.6C18.6 1.88 15.72 1 12.48 1 6.2 1 1.08 6.12 1.08 12.4s5.12 11.4 11.4 11.4c6.56 0 10.92-4.64 10.92-11.12 0-.76-.08-1.32-.2-1.88h-9.72z"/></svg></button>
-                        <button class="s-btn" onclick="window.open('https://github.com')"><svg viewBox="0 0 24 24"><path fill="#333" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></button>
-                    </div>
-                </div>
-            </div>
+      <!-- Social Icons -->
+      <div class="social-area">
+        <div class="social-icons">
+          <button class="s-btn" onclick="window.open('https://google.com')">
+            <svg viewBox="0 0 24 24"><path fill="#EA4335" d="M12.48 10.92v3.28h7.84c-.24 1.84-1.92 5.44-7.84 5.44-5.12 0-9.28-4.24-9.28-9.44s4.16-9.44 9.28-9.44c2.92 0 4.88 1.2 6 2.28l2.6-2.6C18.6 1.88 15.72 1 12.48 1 6.2 1 1.08 6.12 1.08 12.4s5.12 11.4 11.4 11.4c6.56 0 10.92-4.64 10.92-11.12 0-.76-.08-1.32-.2-1.88h-9.72z"/></svg>
+          </button>
+          <button class="s-btn" onclick="window.open('https://github.com')">
+            <svg viewBox="0 0 24 24"><path fill="#333" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          </button>
+          <button class="s-btn" onclick="window.open('https://linkedin.com')">
+            <svg viewBox="0 0 24 24"><path fill="#0077B5" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+          </button>
         </div>
-
-        <!-- REGISTER CARD -->
-        <div id="regCard" class="card">
-            <img src="https://images.unsplash.com" class="banner-img" alt="Register">
-            <div class="card-body">
-                <h1 class="project-title">EventMate</h1>
-                <h2>Join Us</h2>
-                <p class="sub">Create your account to start planning</p>
-
-                <div class="input-group"><label>Full Name</label><input type="text" placeholder="John Doe"></div>
-                <div class="input-group"><label>Username</label><input type="text" placeholder="Create username"></div>
-                <div class="input-group"><label>Password</label><input type="password" placeholder="••••••••"></div>
-
-                <button class="btn-main" onclick="alert('Registration complete!')">Sign Up</button>
-                <p style="margin-top:15px; font-size:13px;">Already have an account? <span style="color:var(--primary); cursor:pointer; font-weight:700;" onclick="showCard('loginCard')">Login</span></p>
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        function showCard(id) {
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('active-card'));
-            document.getElementById(id).classList.add('active-card');
-        }
+  <!-- REGISTER CARD -->
+  <div id="regCard" class="card">
+    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e" class="banner-img" alt="Register" />
+    <div class="card-body">
+      <h2>Join Us</h2>
+      <p class="sub">Create your account to start booking events</p>
 
-        function changeTheme(role) {
-            document.getElementById('mainBody').className = role;
-        }
+      <div class="input-group"><label>Full Name</label><input type="text" id="regName" placeholder="John Doe" /></div>
+      <div class="input-group"><label>Username</label><input type="text" id="regUser" placeholder="Create username" /></div>
+      <div class="input-group"><label>Password</label><input type="password" id="regPass" placeholder="••••••••" /></div>
 
-        function performLogin() {
-            const user = document.getElementById('loginUser').value;
-            const role = document.getElementById('loginRole').value;
-            if(user) {
-                alert('Welcome ' + user + '! Logged in as ' + role);
-            } else {
-                alert('Please enter a username');
-            }
-        }
-    </script>
+      <button class="btn-main" onclick="handleReg()">Create Account</button>
+      <p style="margin-top:15px; font-size:13px;">Already registered? <span style="color:var(--primary); cursor:pointer; font-weight:700;" onclick="showCard('loginCard')">Sign In</span></p>
+    </div>
+  </div>
+
+  <!-- USER PANEL -->
+  <div id="userPanel" class="panel">
+    <h2 style="color:var(--primary)">Hello, <span id="userGreet"></span>!</h2>
+    <p style="margin-bottom: 25px;">Ready to book your next time slot?</p>
+
+    <div style="max-width: 400px;">
+      <div class="input-group">
+        <label>Event Category</label>
+        <select id="eventPick">
+          <option>Product Workshop</option>
+          <option>Partner Meeting</option>
+          <option>Annual Gala</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Preferred Time</label>
+        <input type="datetime-local" id="eventTime" />
+      </div>
+      <button class="btn-main" onclick="confirmBooking()">Book Event Now</button>
+      <button onclick="location.reload()" style="width:100%; margin-top:15px; background:none; border:none; color:#ef4444; cursor:pointer; font-weight:600;">Log Out</button>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="adminPanel" class="panel">
+    <h2>Master Dashboard</h2>
+    <p style="color:#6b7280; font-size: 14px;">Real-time event booking logs for all users.</p>
+
+    <table>
+      <thead><tr><th>User</th><th>Role Type</th><th>Event Name</th><th>Scheduled Time</th></tr></thead>
+      <tbody id="logBody"></tbody>
+    </table>
+
+    <div style="margin-top: 30px; display:flex; gap:10px;">
+      <button class="btn-main" onclick="location.reload()" style="width: 140px;">Logout</button>
+      <button class="btn-main" style="background:#374151; width: 140px;" onclick="localStorage.clear(); location.reload();">Clear All</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 1. UI Navigation
+  function changeTheme(role) {
+    document.getElementById('mainBody').className = role;
+  }
+
+  function showCard(id) {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('active-card'));
+    document.getElementById(id).classList.add('active-card');
+  }
+
+  // 2. Registration Logic
+  function handleReg() {
+    const user = document.getElementById('regUser').value;
+    const pass = document.getElementById('regPass').value;
+
+    if (!user || !pass) return alert("Fill all fields!");
+
+    let db = JSON.parse(localStorage.getItem('portal_auth')) || [];
+
+    // Check if user already exists
+    const existingUser = db.find(u => u.user === user);
+    if (existingUser) {
+      return alert("User already exists!");
+    }
+
+    // Save user with username and password only
+    db.push({ user, pass });
+    localStorage.setItem('portal_auth', JSON.stringify(db));
+
+    alert("Registration Success! Please login.");
+    showCard('loginCard');
+  }
+
+  // 3. Login Logic
+  function performLogin() {
+    const user = document.getElementById('loginUser').value;
+    const pass = document.getElementById('loginPass').value;
+
+    const db = JSON.parse(localStorage.getItem('portal_auth')) || [];
+    const validUser = db.find(u => u.user === user && u.pass === pass);
+
+    if (validUser) {
+      document.getElementById('loginCard').style.display = 'none';
+
+      // Show user panel
+      document.getElementById('userPanel').classList.add('active-panel');
+      document.getElementById('userGreet').innerText = user;
+    } else {
+      alert("Invalid Login Credentials");
+    }
+  }
+
+  // 4. Booking Logic
+  function confirmBooking() {
+    const user = document.getElementById('loginUser').value;
+    const event = document.getElementById('eventPick').value;
+    const time = document.getElementById('eventTime').value;
+
+    if (!time) return alert("Select a time!");
+
+    const bookings = JSON.parse(localStorage.getItem('portal_bookings')) || [];
+    bookings.push({ user, role: '', event, time: time.replace('T', ' ') });
+    localStorage.setItem('portal_bookings', JSON.stringify(bookings));
+
+    alert("Success! Your booking for " + event + " is confirmed.");
+  }
+
+  // 5. Load logs for admin
+  function loadLogs() {
+    const logs = JSON.parse(localStorage.getItem('portal_bookings')) || [];
+    const body = document.getElementById('logBody');
+    body.innerHTML = logs.length ? logs.map(l =>
+      `<tr><td>${l.user}</td><td></td><td>${l.event}</td><td>${l.time}</td></tr>`
+    ).join('') : '<tr><td colspan="4" style="text-align:center; padding: 20px;">No bookings found.</td></tr>';
+  }
+</script>
+
 </body>
 </html>
